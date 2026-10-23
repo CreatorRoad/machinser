@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_retention_advance" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.retention.advance</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="45"/>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//block[@id='invoicing_settings']" position="after">
+                <block title="Contractor Invoicing (Retention &amp; Advance)" id="retention_advance_settings">
+                    <setting id="retention_account_setting" string="Retention Receivable Account" help="Account where retention guarantee deductions are held until project handover.">
+                        <field name="retention_account_id" options="{'no_create': True}"/>
+                    </setting>
+                    <setting id="default_retention_setting" string="Default Retention %" help="Default retention percentage applied on customer invoices.">
+                        <field name="retention_percentage" class="oe_inline"/> %
+                    </setting>
+                    <setting id="retention_journal_setting" string="Retention Journal" help="General journal used to record retention holding and release entries.">
+                        <field name="retention_journal_id" options="{'no_create': True}"/>
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

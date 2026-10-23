@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_invoice_document_inherit_retention_advance" inherit_id="account.report_invoice_document">
+        <xpath expr="//table[hasclass('o_total_table')]//t[@t-call='account.document_tax_totals']" position="after">
+            <t t-if="o.is_sale_document(include_receipts=True) and (o.retention_amount or o.advance_recovery_amount)">
+                <tr t-if="o.retention_amount">
+                    <td>
+                        <span>Less Retention (<t t-esc="'%.1f' % o.retention_percentage"/>%)</span>
+                        <t t-if="o.handover_date">
+                            <small class="d-block text-muted">
+                                Expected Handover: <span t-field="o.handover_date"/>
+                            </small>
+                        </t>
+                    </td>
+                    <td class="text-end">
+                        <span>- </span><span t-field="o.retention_amount"/>
+                    </td>
+                </tr>
+
+                <tr t-if="o.advance_recovery_amount">
+                    <td>
+                        <span>Less Advance Recovery</span>
+                        <t t-if="o.advance_recovery_type == 'percentage'">
+                            <span> (<t t-esc="'%.1f' % o.advance_recovery_percentage"/>%)</span>
+                        </t>
+                    </td>
+                    <td class="text-end">
+                        <span>- </span><span t-field="o.advance_recovery_amount"/>
+                    </td>
+                </tr>
+
+                <tr class="border-top fw-bold">
+                    <td>
+                        <strong>Amount to Pay Now</strong>
+                    </td>
+                    <td class="text-end">
+                        <strong><span t-field="o.amount_to_pay_now"/></strong>
+                    </td>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_inherit_retention_advance" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.retention.advance</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_release_retention_single"
+                        string="Release Retention"
+                        type="object"
+                        class="oe_highlight"
+                        invisible="state != 'posted' or retention_balance &lt;= 0 or move_type != 'out_invoice'"/>
+            </xpath>
+
+            <xpath expr="//sheet//div[@name='button_box']" position="inside">
+                <button name="action_view_retention_entry"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-lock"
+                        invisible="not retention_move_id">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Retention</span>
+                        <span class="o_stat_text">Entry</span>
+                    </div>
+                </button>
+                <button name="action_view_retention_releases"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-unlock"
+                        invisible="not retention_release_move_ids">
+                    <div class="o_stat_info">
+                        <span class="o_stat_text">Retention</span>
+                        <span class="o_stat_text">Released</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="project_sale_order_id"
+                       invisible="move_type not in ('out_invoice', 'out_refund')"
+                       readonly="state != 'draft'"
+                       options="{'no_create': True}"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page id="retention_advance_tab"
+                      name="retention_advance_tab"
+                      string="Retention &amp; Advance"
+                      invisible="move_type not in ('out_invoice', 'out_refund')">
+                    <group>
+                        <group string="Retention Guarantee">
+                            <field name="retention_percentage" readonly="state != 'draft'"/>
+                            <field name="retention_amount" readonly="state != 'draft'"/>
+                            <field name="handover_date" readonly="state != 'draft'"/>
+                            <field name="retention_released_amount" invisible="state == 'draft'"/>
+                            <field name="retention_balance" invisible="state == 'draft'"/>
+                            <field name="retention_move_id" readonly="1" invisible="not retention_move_id"/>
+                        </group>
+                        <group string="Advance Recovery">
+                            <field name="advance_payment_id"
+                                   readonly="state != 'draft'"
+                                   options="{'no_create': True}"/>
+                            <field name="advance_remaining_on_payment"
+                                   invisible="not advance_payment_id"/>
+                            <field name="advance_recovery_type"
+                                   readonly="state != 'draft' or not advance_payment_id"/>
+                            <field name="advance_recovery_percentage"
+                                   invisible="advance_recovery_type != 'percentage'"
+                                   readonly="state != 'draft' or not advance_payment_id"/>
+                            <field name="advance_recovery_amount"
+                                   readonly="state != 'draft' or not advance_payment_id or advance_recovery_type == 'percentage'"/>
+                            <field name="advance_reconciled_partial_id"
+                                   readonly="1"
+                                   invisible="not advance_reconciled_partial_id"/>
+                        </group>
+                    </group>
+                    <group class="oe_subtotal_footer">
+                        <field name="amount_untaxed"/>
+                        <field name="amount_tax"/>
+                        <field name="amount_total" class="oe_subtotal_footer_separator"/>
+                        <field name="retention_amount" string="Less Retention"/>
+                        <field name="advance_recovery_amount" string="Less Advance Recovery"/>
+                        <field name="amount_to_pay_now" class="oe_subtotal_footer_separator" string="Amount to Pay Now"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_invoice_tree_inherit_retention" model="ir.ui.view">
+        <field name="name">account.move.tree.inherit.retention</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='amount_total_in_currency_signed']" position="after">
+                <field name="retention_amount" optional="show" sum="Total Retention"/>
+                <field name="retention_balance" optional="hide" sum="Total Retention Balance"/>
+                <field name="advance_recovery_amount" optional="show" sum="Total Advance Recovered"/>
+                <field name="amount_to_pay_now" optional="show" sum="Total Amount to Pay Now"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
